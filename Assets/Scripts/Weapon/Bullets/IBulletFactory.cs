@@ -1,5 +1,8 @@
-﻿using System.Linq;
-using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using UniRx;
+using Object = UnityEngine.Object;
 
 namespace Weapon.Bullets
 {
@@ -11,9 +14,17 @@ namespace Weapon.Bullets
     public class BulletFactory : IBulletFactory
     {
         private readonly IBulletData[] _bulletDatas;
+        private Dictionary<string, Queue<Bullet>> _bulletsDictionary;
+        
         public BulletFactory(IWeaponStorage weaponStorage)
         {
             _bulletDatas = weaponStorage.Bullets.ToArray();
+
+            _bulletsDictionary = new();
+            foreach (var data in _bulletDatas)
+            {
+                _bulletsDictionary.Add(data.Name, new Queue<Bullet>());
+            }
         }
         public Bullet GetBullet(string name)
         {
@@ -22,9 +33,37 @@ namespace Weapon.Bullets
                 return null;
             }
 
-            IBulletData selected = _bulletDatas.First(x => x.Name == name);
+            if (!_bulletsDictionary.TryGetValue(name, out Queue<Bullet> queue))
+            {
+                throw new NullReferenceException($"None queue for {name} bullet");
+            }
 
-            return Object.Instantiate(selected.Prefab);
+            if (TryDequeue(ref queue, out Bullet bullet))
+            {
+                bullet.Init();
+                return bullet;
+            }
+            
+            
+            IBulletData selected = _bulletDatas.First(x => x.Name == name);
+            Bullet newBullet = Object.Instantiate(selected.Prefab);
+            newBullet.Init(selected.BulletArgs);
+            newBullet.OnDestroy.Subscribe(_ =>
+            {
+                queue.Enqueue(newBullet);
+            }).AddTo(newBullet);
+            
+            return newBullet;
+        }
+
+        private bool TryDequeue(ref Queue<Bullet> queue, out Bullet bullet)
+        {
+            if (queue.TryDequeue(out bullet))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

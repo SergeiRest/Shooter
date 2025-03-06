@@ -7,9 +7,18 @@ namespace Weapon.Bullets
     {
         [SerializeField] private string _name;
         [SerializeField] private Bullet _prefab;
+        [SerializeField] private BulletArgs _bulletArgs;
 
+        public BulletArgs BulletArgs => _bulletArgs;
         public string Name => _name;
 
         public Bullet Prefab => _prefab;
+    }
+    
+    [System.Serializable]
+    public struct BulletArgs
+    {
+        public int Damage;
+        public float LifeTime;
     }
 }

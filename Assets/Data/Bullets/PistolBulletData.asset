@@ -15,3 +15,6 @@ MonoBehaviour:
   _name: DebugBullet
   _prefab: {fileID: -1687031704834821330, guid: 7a5b94f35ade3154ca17a533e5108e76,
     type: 3}
+  _bulletArgs:
+    Damage: 5
+    LifeTime: 3

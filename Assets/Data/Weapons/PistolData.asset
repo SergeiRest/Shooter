@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: PistolData
   m_EditorClassIdentifier: 
   _maxBullets: 30
+  _cooldown: 1.5
   _bulletId: DebugBullet
   _weaponId: DebugWeapon
   _prefab: {fileID: -7933525994072344137, guid: 9d484ba6ff4483d489ca1d8405a15f59,

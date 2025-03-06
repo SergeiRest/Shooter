@@ -1,4 +1,6 @@
-﻿using UniRx;
+﻿using Cysharp.Threading.Tasks;
+using Main;
+using UniRx;
 using VContainer;
 using Weapon.Bullets;
 
@@ -13,18 +15,20 @@ namespace Weapon
 
         private bool _isReload;
         private int _maxBullets;
+        private float _cooldown;
         private string _bullet;
         private WeaponContext _weaponContext;
 
         public IntReactiveProperty BulletsCount => _bulletsCount;
         public ReactiveCommand ReactiveReload => _reload;
 
-        public BaseWeapon(int bulletsCount, string bullet, WeaponContext weaponContext)
+        public BaseWeapon(int bulletsCount, float cooldown, string bullet, WeaponContext weaponContext)
         {
             _maxBullets = bulletsCount;
             _bulletsCount = new IntReactiveProperty(bulletsCount);
             _bullet = bullet;
             _weaponContext = weaponContext;
+            _cooldown = cooldown;
             _reload = new ReactiveCommand();
         }
 
@@ -43,7 +47,7 @@ namespace Weapon
 
         public void Reload()
         {
-            
+            OnReload();
         }
 
         protected virtual void OnShot()
@@ -53,12 +57,16 @@ namespace Weapon
             bullet.transform.rotation = _weaponContext.BulletPoint.rotation;
         }
 
-        protected virtual void OnReload()
+        protected virtual async void OnReload()
         {
             if(_isReload)
                 return;
 
             _isReload = true;
+            ReactiveReload?.Execute();
+            await UniTask.Delay(_cooldown.ToSec());
+            _bulletsCount.Value = _maxBullets;
+            _isReload = false;
         }
     }
 }

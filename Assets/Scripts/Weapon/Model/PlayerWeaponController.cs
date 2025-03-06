@@ -17,7 +17,7 @@ namespace Weapon
         [Inject] private IUIContainer _uiContainer;
 
         private Transform _weaponTransform;
-        private BaseWeapon _selected;
+        private IWeapon _selected;
         private CompositeDisposable _compositeDisposable;
 
         public PlayerWeaponController(Transform weaponTransform)
@@ -36,7 +36,7 @@ namespace Weapon
             contextTransform.localScale = Vector3.one;
             contextTransform.localPosition = Vector3.zero;
 
-            _selected = new BaseWeapon(weaponData.MaxBullets, weaponData.BulletId, context);
+            _selected = new BaseWeapon(weaponData.MaxBullets, weaponData.Cooldown, weaponData.BulletId, context);
             _objectResolver.Inject(_selected);
 
             _touchListener.LeftMouseButton.Subscribe(_ =>
@@ -48,7 +48,6 @@ namespace Weapon
             view.SetMaxBullets(weaponData.MaxBullets);
 
             _selected.BulletsCount.Subscribe(view.SetAmount).AddTo(_compositeDisposable);
-
         }
     }
 }

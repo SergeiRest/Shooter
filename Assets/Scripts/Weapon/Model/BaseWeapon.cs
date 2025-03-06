@@ -1,8 +1,12 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Main;
 using UniRx;
+using UnityEngine;
 using VContainer;
 using Weapon.Bullets;
+using Weapon.Data;
 
 namespace Weapon
 {
@@ -12,23 +16,24 @@ namespace Weapon
 
         private IntReactiveProperty _bulletsCount;
         private ReactiveCommand _reload;
+        private CancellationTokenSource _cts = new ();
 
+        private WeaponArgs _args;
         private bool _isReload;
-        private int _maxBullets;
-        private float _cooldown;
+        private bool _isOnShoot;
         private string _bullet;
         private WeaponContext _weaponContext;
+        private IDisposable _shootDisposable;
 
         public IntReactiveProperty BulletsCount => _bulletsCount;
         public ReactiveCommand ReactiveReload => _reload;
 
-        public BaseWeapon(int bulletsCount, float cooldown, string bullet, WeaponContext weaponContext)
+        public BaseWeapon(WeaponArgs args, string bullet, WeaponContext weaponContext)
         {
-            _maxBullets = bulletsCount;
-            _bulletsCount = new IntReactiveProperty(bulletsCount);
+            _args = args;
+            _bulletsCount = new IntReactiveProperty(_args.MaxBullets);
             _bullet = bullet;
             _weaponContext = weaponContext;
-            _cooldown = cooldown;
             _reload = new ReactiveCommand();
         }
 
@@ -41,7 +46,6 @@ namespace Weapon
                 return;
             }
 
-            _bulletsCount.Value--;
             OnShot();
         }
 
@@ -50,11 +54,25 @@ namespace Weapon
             OnReload();
         }
 
-        protected virtual void OnShot()
+        protected virtual async void OnShot()
         {
+            if(_isOnShoot)
+                return;
+
+            _isOnShoot = true;
+            _bulletsCount.Value--;
             Bullet bullet = _bulletFactory.GetBullet(_bullet);
             bullet.transform.position = _weaponContext.BulletPoint.position;
             bullet.transform.rotation = _weaponContext.BulletPoint.rotation;
+            try
+            {
+                await UniTask.Delay(_args.ShootDelay.ToSec(), cancellationToken: _cts.Token);
+                _isOnShoot = false;
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log("OperationWasCancelled");
+            }
         }
 
         protected virtual async void OnReload()
@@ -64,9 +82,21 @@ namespace Weapon
 
             _isReload = true;
             ReactiveReload?.Execute();
-            await UniTask.Delay(_cooldown.ToSec());
-            _bulletsCount.Value = _maxBullets;
-            _isReload = false;
+            try
+            {
+                await UniTask.Delay(_args.ReloadTime.ToSec(), cancellationToken: _cts.Token);
+                _bulletsCount.Value = _args.MaxBullets;
+                _isReload = false;
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log("Operation was canceled");
+            }
+        }
+
+        public void Cancel()
+        {
+            _cts?.Cancel();
         }
     }
 }

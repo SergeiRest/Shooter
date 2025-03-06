@@ -36,7 +36,8 @@ namespace Weapon
             contextTransform.localScale = Vector3.one;
             contextTransform.localPosition = Vector3.zero;
 
-            _selected = new BaseWeapon(weaponData.MaxBullets, weaponData.Cooldown, weaponData.BulletId, context);
+            WeaponArgs args = weaponData.Args;
+            _selected = new BaseWeapon(args, weaponData.BulletId, context);
             _objectResolver.Inject(_selected);
 
             _touchListener.LeftMouseButton.Subscribe(_ =>
@@ -45,7 +46,7 @@ namespace Weapon
             }).AddTo(_compositeDisposable);
             
             BulletsView view = _uiContainer.GetUI<BulletsView>();
-            view.SetMaxBullets(weaponData.MaxBullets);
+            view.SetMaxBullets(args.MaxBullets);
 
             _selected.BulletsCount.Subscribe(view.SetAmount).AddTo(_compositeDisposable);
         }

@@ -11,7 +11,7 @@ namespace Weapon.Bullets
         public Bullet GetBullet(string name);
     }
 
-    public class BulletFactory : IBulletFactory
+    public class BulletFactory : IBulletFactory, IDisposable
     {
         private readonly IBulletData[] _bulletDatas;
         private Dictionary<string, Queue<Bullet>> _bulletsDictionary;
@@ -47,7 +47,7 @@ namespace Weapon.Bullets
             
             IBulletData selected = _bulletDatas.First(x => x.Name == name);
             Bullet newBullet = Object.Instantiate(selected.Prefab);
-            newBullet.Init(selected.BulletArgs);
+            newBullet.Init(selected.BulletArgs, selected.Speed);
             newBullet.OnDestroy.Subscribe(_ =>
             {
                 queue.Enqueue(newBullet);
@@ -64,6 +64,16 @@ namespace Weapon.Bullets
             }
 
             return false;
+        }
+
+        public void Dispose()
+        {
+            foreach (var pair in _bulletsDictionary)
+            {
+                pair.Value.Clear();
+            }
+            
+            _bulletsDictionary.Clear();
         }
     }
 }

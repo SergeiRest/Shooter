@@ -15,7 +15,7 @@ namespace Health
 
         public void TakeDamage(int value)
         {
-            value = Mathf.Clamp(value, 1, int.MaxValue);
+            value = Mathf.Clamp(value, 0, int.MaxValue);
             _health.Value -= value;
         }
     }

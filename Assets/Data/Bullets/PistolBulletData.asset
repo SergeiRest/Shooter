@@ -18,3 +18,4 @@ MonoBehaviour:
   _bulletArgs:
     Damage: 5
     LifeTime: 3
+  _speed: 15

@@ -1,3 +1,4 @@
+using Main.Damage;
 using UnityEngine;
 
 namespace Weapon.Bullets
@@ -7,18 +8,13 @@ namespace Weapon.Bullets
     {
         [SerializeField] private string _name;
         [SerializeField] private Bullet _prefab;
-        [SerializeField] private BulletArgs _bulletArgs;
+        [SerializeField] private DamageArgs _bulletArgs;
+        [SerializeField] private float _speed;
 
-        public BulletArgs BulletArgs => _bulletArgs;
+        public DamageArgs BulletArgs => _bulletArgs;
         public string Name => _name;
 
         public Bullet Prefab => _prefab;
-    }
-    
-    [System.Serializable]
-    public struct BulletArgs
-    {
-        public int Damage;
-        public float LifeTime;
+        public float Speed => _speed;
     }
 }

@@ -4,9 +4,9 @@ using VContainer.Unity;
 
 namespace Input
 {
-    public class MouseRotator : IInputRotator
+    public class MouseRotator : IInputRotator, IInitializable
     {
-        private float _senserive = 100;
+        private float _senserive = 300;
         private int _ticks = 0;
 
         public Vector3 GetAxis()
@@ -20,6 +20,12 @@ namespace Input
 
             return new Vector3(x, y, 0);
 
+        }
+
+        public void Initialize()
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
         }
     }
 }

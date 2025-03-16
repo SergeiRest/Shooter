@@ -9,7 +9,7 @@ namespace ProjectInstaller
     {
         private void Start()
         {
-            Observable.Timer(TimeSpan.FromSeconds(0.5f)).Subscribe(_ =>
+            Observable.Timer(TimeSpan.FromSeconds(0.2f)).Subscribe(_ =>
             {
                 SceneManager.LoadScene(1);
             }).AddTo(gameObject);

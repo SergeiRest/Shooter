@@ -1,5 +1,6 @@
 ﻿using Input.InputListener;
 using Main.Enemy;
+using Main.Overlap;
 using UnityEngine;
 using VContainer;
 using Weapon;
@@ -15,6 +16,8 @@ namespace Installer
         {
             // INPUT
             builder.Register<MouseTouchListener>(Lifetime.Singleton).AsImplementedInterfaces();
+
+            builder.Register<OverlapService>(Lifetime.Singleton).AsImplementedInterfaces();
             
             // WEAPON
             builder.RegisterInstance<WeaponStorage>(weaponStorage).AsImplementedInterfaces();

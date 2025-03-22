@@ -2,6 +2,7 @@
 using Health;
 using Input;
 using Input.InputListener;
+using Main.Damage;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -43,6 +44,10 @@ namespace Player
         {
             _healthController = new PlayerHealthController();
             _weaponController = new PlayerWeaponController(_component.WeaponRoot);
+            /*foreach (MonoDamageInteractable interactable in _component.DamageInteractable)
+            {
+                interactable.Init(_healthController);
+            }*/
             
             _objectResolver.Inject(_weaponController);
             _objectResolver.Inject(_healthController);

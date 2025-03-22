@@ -24,15 +24,19 @@ namespace Main.Enemy
             _context = context;
             _healthController = new EnemyHealthController(_context.HealthView);
             _mover = new NavMeshMover(context.agent);
-            _stateMachine = new EnemyStateMachine(_mover);
+            _stateMachine = new EnemyStateMachine(_mover, _context);
             
             foreach (var interactable in _context.interactables)
             {
                 interactable.Init(_healthController);
             }
-            
-            _stateMachine.SetState<MoveState>();
-            
+        }
+
+        [Inject]
+        private void Construct(IObjectResolver resolver)
+        {
+            _stateMachine.Inject(resolver);
+            _stateMachine.SetState<IdleState>();
         }
     }
     

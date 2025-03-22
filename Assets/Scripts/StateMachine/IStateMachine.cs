@@ -1,8 +1,13 @@
-﻿namespace Main.StateMachine
+﻿using UnityEngine;
+using VContainer;
+
+namespace Main.StateMachine
 {
     public interface IStateMachine
     {
+        public Component Main { get; }
         public void SetState<TState>() where TState : IState;
+        public void Inject(IObjectResolver resolver);
     }
 
     public interface IState

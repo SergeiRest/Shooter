@@ -1,9 +1,30 @@
 using System;
+using Cysharp.Threading.Tasks;
 using Main.NPC;
+using Main.Overlap;
 using UniRx;
+using UnityEngine;
+using VContainer;
 
 namespace Main.StateMachine.States
 {
+    public class IdleState : BaseState
+    {
+        [Inject] private IOverlapService _overlapService;
+        
+        public IdleState(IStateMachine stateMachine) : base(stateMachine)
+        {
+            
+        }
+        
+        protected override async void OnEnter()
+        {
+            base.OnEnter();
+            _overlapService.OverlapSphere(StateMachine.Main.transform.position, 15, LayerMasks.Player);
+            await UniTask.Delay(3f.ToSec());
+            StateMachine.SetState<MoveState>();
+        }
+    }
     public class MoveState : BaseState
     {
         private IDisposable _moveDisposable;
@@ -32,7 +53,7 @@ namespace Main.StateMachine.States
 
         private void PathReached(Unit _)
         {
-            FindPath();
+            StateMachine.SetState<IdleState>();
         }
     }
 }
